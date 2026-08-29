@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: kyc-batch-business
+  profiles:
+    active: dev
+  batch:
+    job:
+      enabled: true
+    jdbc:
+      initialize-schema: never
+      table-prefix: KYC_BATCH_
+
+kyc-messages:
+  catalog:
+    messages:
+      "001":
+        code: KYC-BATCH-BUSINESS-001
+        message: Unexpected Error
+        type: ERROR

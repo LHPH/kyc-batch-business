@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/kyc_database
+    username: kyc_user
+    password: kyc_pass
+    driverClassName: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+  jpa:
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+kyc:
+  batch:
+    bills:
+      chunk: 100
+      skip-limit: 10
+
+logging:
+  level:
+    root: INFO
+    com.kyc: INFO
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.batch.item.data: DEBUG
