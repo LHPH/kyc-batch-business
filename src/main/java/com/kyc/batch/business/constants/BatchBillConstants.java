@@ -9,4 +9,7 @@ public final class BatchBillConstants {
 
     public static final String ADD_CUSTOMER_BILL_STEP = String.format(BatchConstants.KYC_BATCH_STEP_TEMPLATE,
             "BILLS","ADD-BILL");
+
+    public static final String ADD_RELATION_CUSTOMER_SERVICE_BILL_STEP = String.format(BatchConstants.KYC_BATCH_STEP_TEMPLATE,
+            "BILLS","ADD-RELATION-CUSTOMER-SERVICE-BILL");
 }

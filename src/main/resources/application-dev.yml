@@ -17,7 +17,10 @@ kyc:
   batch:
     bills:
       chunk: 100
-      skip-limit: 10
+      taxes-amount: 16
+      billing-start-day: 20
+      billing-end-day: 20
+      payment-due-day: 3
 
 logging:
   level:

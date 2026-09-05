@@ -1,8 +1,9 @@
-package com.kyc.batch.business.config.step;
+package com.kyc.batch.business.config.step.bills;
 
 import com.kyc.batch.business.mappers.bills.CustomerBillMonthDataRowMapper;
 import com.kyc.batch.business.model.bills.CustomerBillControlData;
 import com.kyc.batch.business.model.bills.CustomerBillMonthData;
+import com.kyc.batch.business.processors.bills.AddCustomerBillItemProcessor;
 import com.kyc.core.batch.BatchStepListener;
 import com.kyc.core.properties.KycMessages;
 import org.springframework.batch.core.listener.StepListenerSupport;
@@ -25,7 +26,7 @@ import java.util.Properties;
 import static com.kyc.batch.business.constants.BatchBillConstants.ADD_CUSTOMER_BILL_STEP;
 
 @Configuration
-public class AddCustomerBillStep {
+public class AddCustomerBillStepConf {
 
     @Autowired
     private DataSource dataSource;
@@ -36,6 +37,18 @@ public class AddCustomerBillStep {
 
     @Value("${kyc.batch.bills.chunk}")
     private Integer chunkSize;
+
+    @Value("${kyc.batch.bills.taxes-amount}")
+    private Integer taxesAmount;
+
+    @Value("${kyc.batch.bills.billing-start-day}")
+    private Integer billingStartDay;
+
+    @Value("${kyc.batch.bills.billing-end-day}")
+    private Integer billingEndDay;
+
+    @Value("${kyc.batch.bills.payment-due-day}")
+    private Integer paymentDueDay;
 
     @Bean
     public Step addCustomerBillStep(JobRepository jobRepository,
@@ -48,25 +61,29 @@ public class AddCustomerBillStep {
                 .listener(addCustomerBillStepListener(kycMessages))
                 .<CustomerBillMonthData, CustomerBillControlData>chunk(chunkSize)
                 .transactionManager(platformTransactionManager)
-                .reader(readCustomerBillWithNoRelation())
-                .writer(addCustomerBill())
+                .reader(customerBillWithNoRelationItemReader())
+                .processor(addCustomerBillItemProcessor())
+                .writer(addCustomerBillItemWriter())
                 .build();
     }
 
     @Bean
-    public JdbcCursorItemReader<CustomerBillMonthData> readCustomerBillWithNoRelation(){
+    public JdbcCursorItemReader<CustomerBillMonthData> customerBillWithNoRelationItemReader(){
 
         return new JdbcCursorItemReader<>(
                 dataSource,
-                queriesProps.get("readCustomerBillWithNoRelation").toString(),
+                queriesProps.get("selectCustomerBillWithNoRelation").toString(),
                 new CustomerBillMonthDataRowMapper()
         );
     }
 
-
+    @Bean
+    public AddCustomerBillItemProcessor addCustomerBillItemProcessor(){
+        return  new AddCustomerBillItemProcessor(taxesAmount, billingStartDay, billingEndDay, paymentDueDay);
+    }
 
     @Bean
-    public JdbcBatchItemWriter<CustomerBillControlData> addCustomerBill(){
+    public JdbcBatchItemWriter<CustomerBillControlData> addCustomerBillItemWriter(){
 
         JdbcBatchItemWriter<CustomerBillControlData> jdbcBatchItemWriter = new JdbcBatchItemWriter<>();
         jdbcBatchItemWriter.setDataSource(dataSource);
